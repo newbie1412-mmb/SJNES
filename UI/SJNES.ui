@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SJNESClass</class>
+ <widget class="QMainWindow" name="SJNESClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>886</width>
+    <height>649</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SJNES</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QPlainTextEdit" name="txtConsole">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>141</width>
+      <height>111</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="GpuScreenWidget" name="gameScreen" native="true">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>0</y>
+      <width>601</width>
+      <height>571</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>886</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actOpenROM"/>
+    <addaction name="actPower"/>
+    <addaction name="actReset"/>
+    <addaction name="actPause"/>
+    <addaction name="actExit"/>
+   </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <widget class="QMenu" name="menuAudio_Waveform">
+     <property name="title">
+      <string>Audio Oscilloscope view</string>
+     </property>
+     <addaction name="actWaveVRC6"/>
+     <addaction name="actWaveVRC7"/>
+     <addaction name="actWaveS5B"/>
+     <addaction name="actNES"/>
+     <addaction name="actWaveMMC5"/>
+     <addaction name="actWaveN163"/>
+    </widget>
+    <addaction name="menuAudio_Waveform"/>
+    <addaction name="actMapperViewer"/>
+    <addaction name="actSpriteViewer"/>
+    <addaction name="actPaletteViewer"/>
+   </widget>
+   <widget class="QMenu" name="menuRecentROMs_2">
+    <property name="title">
+     <string>RecentROMs</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuhelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actAboutSJNES"/>
+    <addaction name="actQuickStart"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionrecord"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="actOpenSettings"/>
+   <addaction name="menuDebug"/>
+   <addaction name="menuRecentROMs_2"/>
+   <addaction name="menuhelp"/>
+   <addaction name="menuTools"/>
+  </widget>
+  <action name="actOpenSettings">
+   <property name="text">
+    <string>Setting</string>
+   </property>
+  </action>
+  <action name="actOpenROM">
+   <property name="text">
+    <string>Open ROM</string>
+   </property>
+  </action>
+  <action name="actReset">
+   <property name="text">
+    <string>RESET</string>
+   </property>
+  </action>
+  <action name="actPause">
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actPixelPerfect">
+   <property name="text">
+    <string>Pixel perfect</string>
+   </property>
+  </action>
+  <action name="actScanline">
+   <property name="text">
+    <string>Scanline</string>
+   </property>
+  </action>
+  <action name="actCrtLite">
+   <property name="text">
+    <string>CRT Lite</string>
+   </property>
+  </action>
+  <action name="actMapperViewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Mapper Viewer</string>
+   </property>
+  </action>
+  <action name="actSpriteViewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sprite Viewer</string>
+   </property>
+  </action>
+  <action name="action60fps">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>60fps</string>
+   </property>
+  </action>
+  <action name="actionOverclockOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>OFF</string>
+   </property>
+  </action>
+  <action name="actionOverclock50">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>+50</string>
+   </property>
+  </action>
+  <action name="actionOverclock100">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>+100</string>
+   </property>
+  </action>
+  <action name="actionOverclock200">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>+200</string>
+   </property>
+  </action>
+  <action name="actionOverclock250">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>+250</string>
+   </property>
+  </action>
+  <action name="actRemoveSpriteLimit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>remove 8 sprite limit</string>
+   </property>
+  </action>
+  <action name="menuRecentROMs">
+   <property name="text">
+    <string>Recent ROMs</string>
+   </property>
+  </action>
+  <action name="actMono">
+   <property name="text">
+    <string>Mono</string>
+   </property>
+  </action>
+  <action name="actStereo">
+   <property name="text">
+    <string>Stereo</string>
+   </property>
+  </action>
+  <action name="actSmoothTriangle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Smooth Triangle (Not Accuracy)</string>
+   </property>
+  </action>
+  <action name="actPulse1">
+   <property name="text">
+    <string>Pulse1</string>
+   </property>
+  </action>
+  <action name="actPulse2">
+   <property name="text">
+    <string>Pulse2</string>
+   </property>
+  </action>
+  <action name="actTriangle">
+   <property name="text">
+    <string>Triangle</string>
+   </property>
+  </action>
+  <action name="actNoise">
+   <property name="text">
+    <string>Noise</string>
+   </property>
+  </action>
+  <action name="actDMC">
+   <property name="text">
+    <string>DMC</string>
+   </property>
+  </action>
+  <action name="actVRC6">
+   <property name="text">
+    <string>VRC6</string>
+   </property>
+  </action>
+  <action name="actAboutSJNES">
+   <property name="text">
+    <string>About SJNES</string>
+   </property>
+  </action>
+  <action name="actQuickStart">
+   <property name="text">
+    <string>Quick start</string>
+   </property>
+  </action>
+  <action name="actWaveVRC6">
+   <property name="text">
+    <string>VRC6</string>
+   </property>
+  </action>
+  <action name="actWaveVRC7">
+   <property name="text">
+    <string>VRC7</string>
+   </property>
+  </action>
+  <action name="actWaveS5B">
+   <property name="text">
+    <string>S5B</string>
+   </property>
+  </action>
+  <action name="actNES">
+   <property name="text">
+    <string>NES</string>
+   </property>
+  </action>
+  <action name="actWaveMMC5">
+   <property name="text">
+    <string>MMC5</string>
+   </property>
+  </action>
+  <action name="actWaveN163">
+   <property name="text">
+    <string>N163</string>
+   </property>
+  </action>
+  <action name="actPower">
+   <property name="text">
+    <string>Power OFF/ON</string>
+   </property>
+  </action>
+  <action name="chkAutoA">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Auto A</string>
+   </property>
+  </action>
+  <action name="chkAutoB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Auto B</string>
+   </property>
+  </action>
+  <action name="actSmoothSaw">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Smooth Sawtooth (Not accuracy)</string>
+   </property>
+  </action>
+  <action name="actEqualizer">
+   <property name="text">
+    <string>Equalizer</string>
+   </property>
+  </action>
+  <action name="actPaletteViewer">
+   <property name="text">
+    <string>Palette Viewer</string>
+   </property>
+  </action>
+  <action name="actdmcreverse">
+   <property name="text">
+    <string>Reverse dpcm bit order </string>
+   </property>
+  </action>
+  <action name="actN163">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Smooth Namco163 (Not Accuracy)</string>
+   </property>
+  </action>
+  <action name="actSmoothPulse">
+   <property name="text">
+    <string>Smooth Pulse</string>
+   </property>
+  </action>
+  <action name="actionrecord">
+   <property name="text">
+    <string>record</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>GpuScreenWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">GpuScreenWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
