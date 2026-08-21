@@ -8,6 +8,7 @@
 #include "Noise.h"
 #include "Mapper_024.h"
 #include <QMetaType>
+#include <QString>
 struct AudioDebugChannels {
     float pulse1 = 0.0f;
     float pulse2 = 0.0f;
@@ -127,12 +128,32 @@ public:
     bool muteTriangle = false;
     bool muteNoise = false;
     bool muteDMC = false;
+
+    // Gain riêng từng kênh (0.0 - 2.0, mặc định 1.0 = không đổi so với gốc).
+    // Tách biệt hoàn toàn với mute: mute = tắt hẳn, gain = chỉnh to/nhỏ khi
+    // KHÔNG mute. Áp dụng ngay tại GetOutputSampleStereo(), trước khi mix TND/Pulse.
+    float gainPulse1 = 1.0f;
+    float gainPulse2 = 1.0f;
+    float gainTriangle = 1.0f;
+    float gainNoise = 1.0f;
+    float gainDMC = 1.0f;
+
+    // channelId khớp với chuỗi SettingsDialog gửi qua channelGainChanged:
+    // "nes.pulse1", "nes.pulse2", "nes.triangle", "nes.noise", "nes.dmc".
+    // Kênh không khớp id nào thì bị bỏ qua (không crash), để mở rộng dần
+    // sang expansion chip (VRC6/S5B/VRC7/MMC5/N163) ở các mapper riêng sau này.
+    void SetChannelGain(const QString& channelId, float gain);
     bool smoothSawEnabled = false;
     void SetSmoothSaw(bool enable);
     // Bật/tắt "Reverse DPCM Bit Order" — bù cho ROM encode sample DMC sai thứ tự bit
-    // (Double Dribble, Gimmick!, một số famiclone...). 
+    // (Double Dribble, Gimmick!, một số famiclone...). Mặc định tắt.
     void SetReverseDpcmBits(bool enable) { dmc.reverseBits = enable; }
     bool GetReverseDpcmBits() const { return dmc.reverseBits; }
+    // Bật/tắt "Reduce popping sounds on DMC channel" — làm mượt (ramp +-2 mỗi
+    // timer clock) khi CPU ghi trực tiếp $4011 thay vì set output_level ngay
+    // lập tức, tránh tiếng click/pop. Mặc định tắt (giữ hardware-accurate).
+    void SetDMCReducePopping(bool enable) { dmc.reducePopping = enable; }
+    bool GetDMCReducePopping() const { return dmc.reducePopping; }
     Mapper* mapper = nullptr;
     void SetSmoothTriangle(bool smooth) { tri.smooth = smooth; }
     bool GetSmoothTriangle() const { return tri.smooth; }
@@ -148,8 +169,8 @@ private:
     int  frame_seq_count = 0;
     bool use_5step_mode = false;
     bool apu_half_clock = false;
-    bool frame_irq_flag = false;  
-    bool irq_inhibit = false;    
+    bool frame_irq_flag = false;
+    bool irq_inhibit = false;
 
     float hp1 = 0.0f, prev_in1 = 0.0f;
     float hp2 = 0.0f, prev_in2 = 0.0f;
