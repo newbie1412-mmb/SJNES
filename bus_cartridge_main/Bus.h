@@ -95,6 +95,10 @@ public:
     uint8_t controller_shift = 0x00;
     uint8_t controller_state2 = 0x00;
     uint8_t controller_shift2 = 0x00;
+    bool zapperConnected = false;
+    bool zapperTrigger = false;
+    int zapperX = -1;
+    int zapperY = -1;
 
 
     // === CÁC BIẾN QUẢN LÝ DMA CHUẨN XÁC ===
@@ -105,6 +109,11 @@ public:
     bool dma_transfer = false;
 
     uint32_t system_clock_counter = 0; // Bộ đếm nhịp hệ thống
+
+    // Giá trị "open bus" - byte cuối cùng thực sự nằm trên bus dữ liệu CPU.
+    // Dùng để giả lập hành vi phần cứng thật khi đọc các port ghi-only
+    // hoặc vùng địa chỉ chưa mapped ($4000-$4013, $4014, $4018-$40FF, ...).
+    uint8_t open_bus = 0x00;
 
     PPU* ppu = nullptr;
     CPU6502* cpu = nullptr; // Con trỏ CPU
@@ -123,6 +132,9 @@ public:
     }
 
     void cpuWrite(uint16_t addr, uint8_t data) {
+        // Mọi byte CPU ghi ra đều thực sự đi qua bus dữ liệu -> cập nhật open bus.
+        open_bus = data;
+
         if (nsfMode && nsfBankMode && addr >= 0x5FF8 && addr <= 0x5FFF)
         {
             nsfBanks[addr - 0x5FF8] = data;
@@ -183,7 +195,11 @@ public:
     }
 
     uint8_t cpuRead(uint16_t addr) {
-        uint8_t data = 0x00;
+        // Mặc định = giá trị open bus hiện tại. Nếu không nhánh nào bên dưới
+        // khớp với addr (vùng chưa mapped hoặc port chỉ-ghi như $4000-$4013,
+        // $4014, $4018-$40FF), hàm sẽ tự nhiên trả về đúng giá trị open bus
+        // thay vì 0x00 cố định - đúng hành vi phần cứng NES thật.
+        uint8_t data = open_bus;
 
         if (nsfMode && nsfBankMode && addr >= 0x8000)
         {
@@ -212,6 +228,7 @@ public:
         }
 
         if (cart != nullptr && cart->cpuRead(addr, data)) {
+            open_bus = data;
             return data;
         }
 
@@ -231,16 +248,30 @@ public:
             data |= 0x40;
         }
         else if (addr == 0x4017) {
-            // tay 2
-            if (controller_strobe) {
-                data = (controller_state2 & 0x80) ? 1 : 0;
+            if (zapperConnected) {
+                data = 0x40;
+                data |= zapperTrigger ? 0x10 : 0x00;
+
+                bool sensedLight = false;
+                if (ppu != nullptr && zapperX >= 0 && zapperY >= 0) {
+                    uint32_t pixel = ppu->GetPixelAt(zapperX, zapperY);
+                    int r = (pixel >> 16) & 0xFF;
+                    int g = (pixel >> 8) & 0xFF;
+                    int b = pixel & 0xFF;
+                    sensedLight = (r + g + b) > 300;
+                }
+                data |= sensedLight ? 0x00 : 0x08;
             }
             else {
-                data = (controller_shift2 & 0x80) ? 1 : 0;
-                controller_shift2 <<= 1;
+                if (controller_strobe) {
+                    data = (controller_state2 & 0x80) ? 1 : 0;
+                }
+                else {
+                    data = (controller_shift2 & 0x80) ? 1 : 0;
+                    controller_shift2 <<= 1;
+                }
+                data |= 0x40;
             }
-
-            data |= 0x40;
         }
         else if (addr >= 0x2000 && addr <= 0x3FFF) {
             if (ppu != nullptr)
@@ -249,6 +280,9 @@ public:
         else if (addr == 0x4015) {
             data = n_apu.readStatus();
         }
+
+        // Byte vừa thực sự xuất hiện trên bus dữ liệu -> lưu lại làm open bus mới.
+        open_bus = data;
         return data;
     }
 
@@ -296,5 +330,5 @@ public:
         }
 
         system_clock_counter++;
-        }
-    };
+    }
+};
