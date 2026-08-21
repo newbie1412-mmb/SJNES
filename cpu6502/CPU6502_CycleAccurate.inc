@@ -243,13 +243,32 @@ void CPU6502::StepInstructionCycle()
         else if (instr_cycle == 2) { write(0x0100 + stkp, (pc >> 8) & 0xFF); stkp--; }
         else if (instr_cycle == 3) { write(0x0100 + stkp, pc & 0xFF); stkp--; }
         else if (instr_cycle == 4) { write(0x0100 + stkp, status | B | U); stkp--; SetFlag(I, true); }
-        else if (instr_cycle == 5) { temp = read(0xFFFE); }
+        else if (instr_cycle == 5)
+        {
+            // === NMI HIJACKING ===
+            // Nếu NMI xảy ra trước thời điểm này (trước khi đọc byte thấp của vector),
+            // phần cứng thật sẽ "cướp" chuỗi BRK: PC/status vẫn được push như BRK bình
+            // thường (đã làm ở cycle 2-4), nhưng vector nạp vào PC sẽ là vector NMI
+            // ($FFFA/$FFFB) thay vì vector BRK/IRQ ($FFFE/$FFFF). NMI coi như đã được
+            // xử lý xong bởi lần hijack này nên phải xoá nmi_pending.
+            if (nmi_pending)
+            {
+                nmi_pending = false;
+                brk_hijacked_by_nmi = true;
+                temp = read(0xFFFA);
+            }
+            else
+            {
+                temp = read(0xFFFE);
+            }
+        }
         else if (instr_cycle == 6)
         {
-            uint16_t hi = read(0xFFFF);
+            uint16_t hi = read(brk_hijacked_by_nmi ? 0xFFFB : 0xFFFF);
             pc = (hi << 8) | temp;
             instr_cycle = 0; cycles = 0;
             irq_disable_shadow = GetFlag(I); owe_shadow_sync = false;
+            brk_hijacked_by_nmi = false;
             return;
         }
         instr_cycle++;
